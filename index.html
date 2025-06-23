@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>App Store ID抽出ツール</title>
+  <style>
+    body { font-family: sans-serif; padding: 2em; }
+    input, button { font-size: 1em; padding: 0.5em; }
+    #output { margin-top: 1em; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>App Store URL から meta タグ生成</h1>
+  <form id="urlForm">
+    <label for="urlInput">App StoreのURLを入力:</label><br>
+    <input type="text" id="urlInput" size="60" placeholder="例: https://apps.apple.com/jp/app/id123456789"><br><br>
+    <button type="submit">生成してheadに挿入</button>
+  </form>
+  <div id="output"></div>
+
+  <script>
+    document.getElementById('urlForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const url = document.getElementById('urlInput').value;
+      const match = url.match(/\/id(\d+)/);
+
+      const output = document.getElementById('output');
+      output.textContent = ''; // 前回の結果をクリア
+
+      if (match && match[1]) {
+        const appId = match[1];
+        const meta = document.createElement('meta');
+        meta.name = "apple-itunes-app";
+        meta.content = `app-id=${appId}`;
+
+        // すでに同じmetaタグがあれば削除
+        const oldMeta = document.querySelector('meta[name="apple-itunes-app"]');
+        if (oldMeta) oldMeta.remove();
+
+        document.head.appendChild(meta);
+
+        output.textContent = `<meta name="apple-itunes-app" content="app-id=${appId}"> を <head> に追加しました。`;
+      } else {
+        output.textContent = 'App StoreのURLに有効なIDが見つかりませんでした。';
+      }
+    });
+  </script>
+</body>
+</html>
